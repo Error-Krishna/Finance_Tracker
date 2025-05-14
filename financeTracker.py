@@ -1,5 +1,6 @@
 
 from flask_cors import CORS
+from flask import render_template
 import base64
 from flask import Flask, request, jsonify, send_from_directory
 from pymongo import MongoClient
@@ -21,7 +22,7 @@ budgets_col = db["budgets"]
 # ---------- Serve HTML / Static Files ----------
 @app.route('/')
 def serve_home():
-    return send_from_directory(os.path.dirname(__file__), 'auth.html')
+    return render_template('auth.html')
 
 @app.route('/<path:filename>')
 def serve_static(filename):
