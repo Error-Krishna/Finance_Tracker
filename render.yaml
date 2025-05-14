@@ -1,0 +1,10 @@
+services:
+  - type: web
+    name: finance-tracker
+    env: python
+    buildCommand: "pip install -r requirements.txt"
+    startCommand: "gunicorn financeTracker:app"
+    plan: free
+    branch: main
+    region: oregon
+    repo: https://github.com/Error-Krishna/Finance_Tracker
