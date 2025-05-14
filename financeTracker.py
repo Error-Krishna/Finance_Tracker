@@ -19,10 +19,9 @@ expenses_col = db["expenses"]
 budgets_col = db["budgets"]
 
 # ---------- Serve HTML / Static Files ----------
-
 @app.route('/')
 def serve_home():
-    return send_from_directory('.', 'auth.html')
+    return send_from_directory(os.path.dirname(__file__), 'auth.html')
 
 @app.route('/<path:filename>')
 def serve_static(filename):
