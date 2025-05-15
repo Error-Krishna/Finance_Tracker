@@ -21,6 +21,9 @@ budgets_col = db["budgets"]
 @app.route('/')
 def serve_home():
     return render_template("auth.html")
+@app.route('/index.html')
+def index_page():
+    return render_template('index.html')
 
 # ---------- USER AUTH ----------
 
