@@ -184,7 +184,7 @@
 
 
 
-from flask import Flask, request, jsonify, send_from_directory
+from flask import Flask, request, jsonify, send_from_directory, render_template
 from flask_cors import CORS
 from flask_pymongo import PyMongo
 from dotenv import load_dotenv
@@ -213,7 +213,7 @@ def serve_static(path):
 
 @app.route('/')
 def serve_home():
-    return send_from_directory(os.getcwd(), 'auth.html')
+    return render_template('auth.html')
 
 @app.route('/signup', methods=['POST'])
 def signup():
