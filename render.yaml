@@ -1,3 +1,16 @@
+# services:
+#   - type: web
+#     name: finance-tracker
+#     env: python
+#     buildCommand: "pip install -r requirements.txt"
+#     startCommand: "gunicorn financeTracker:app"
+#     plan: free
+#     branch: main
+#     region: oregon
+#     repo: https://github.com/Error-Krishna/Finance_Tracker
+
+
+# render.yaml
 services:
   - type: web
     name: finance-tracker
@@ -5,6 +18,5 @@ services:
     buildCommand: "pip install -r requirements.txt"
     startCommand: "gunicorn financeTracker:app"
     plan: free
-    branch: main
-    region: oregon
-    repo: https://github.com/Error-Krishna/Finance_Tracker
+    region: oregon # Adjust as needed for your target audience
+    repo: https://github.com/Error-Krishna/Finance_Tracker # Replace with the actual repo URL

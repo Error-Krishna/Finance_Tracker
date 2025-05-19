@@ -1,10 +1,83 @@
+<!-- <!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Login / Sign Up</title>
+  <link rel="stylesheet" href="static/index.css">
+</head>
+<body>
+  <header>
+    <h1>Welcome to Finance Tracker</h1>
+  </header>
+  <main>
+    <div class="form-container">
+      Login Form 
+      <form id="login-form">
+        <h3>Login</h3>
+        <input type="text" id="login-username" placeholder="Username" required />
+        <input type="password" id="login-password" placeholder="Password" required />
+        <button type="submit">Login</button>
+      </form>
+
+      Signup Form 
+      <form id="signup-form">
+        <h3>Sign Up</h3>
+        <input type="text" id="signup-username" placeholder="Username" required />
+        <input type="password" id="signup-password" placeholder="Password" required />
+        <button type="submit">Sign Up</button>
+      </form>
+    </div>
+  </main>
+
+  <script>
+    const API_BASE = "http://127.0.0.1:5000";
+
+    document.getElementById("signup-form").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const username = document.getElementById("signup-username").value;
+      const password = document.getElementById("signup-password").value;
+
+      const res = await fetch(`${API_BASE}/signup`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ username, password })
+      });
+
+      const data = await res.json();
+      alert(data.message);
+    });
+
+    document.getElementById("login-form").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const username = document.getElementById("login-username").value;
+      const password = document.getElementById("login-password").value;
+
+      const res = await fetch(`${API_BASE}/login`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ username, password })
+      });
+
+      const data = await res.json();
+      if (data.user_id) {
+        localStorage.setItem("user_id", data.user_id);
+        window.location.href = "index.html";
+      } else {
+        alert(data.error);
+      }
+    });
+  </script>
+</body>
+</html> -->
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Login / Sign Up</title>
-  <link rel="stylesheet" href="{{ url_for('static', filename='index.css') }}">
+  <link rel="stylesheet" href="static/index.css">
 </head>
 <body>
   <header>
@@ -31,7 +104,7 @@
   </main>
 
   <script>
-    const API_BASE = "http://127.0.0.1:5000";
+    const API_BASE = "https://finance-tracker-tymo.onrender.com";
 
     document.getElementById("signup-form").addEventListener("submit", async (e) => {
       e.preventDefault();
