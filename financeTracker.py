@@ -210,6 +210,11 @@ def serve_static(path):
     return send_from_directory('static', path)
 
 # API Endpoints
+
+@app.route('/')
+def serve_home():
+    return send_from_directory(os.getcwd(), 'auth.html')
+
 @app.route('/signup', methods=['POST'])
 def signup():
     data = request.json
