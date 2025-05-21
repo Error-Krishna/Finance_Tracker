@@ -83,6 +83,7 @@ def add_income():
         "date": data["date"]
     }
     incomes_col.insert_one(income)
+    print(data)  # inside add_income or add_expense
     return jsonify({"message": "Income added"})
 
 @app.route("/add_expense", methods=["POST"])
@@ -96,6 +97,7 @@ def add_expense():
         "description": data["description"]
     }
     expenses_col.insert_one(expense)
+    print(data)  # inside add_income or add_expense
     return jsonify({"message": "Expense added"})
 
 # ---------- BUDGET FEATURES ----------
