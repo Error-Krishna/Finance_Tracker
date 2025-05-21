@@ -385,11 +385,13 @@ incomeForm.addEventListener("submit", async (e) => {
 });
 
 // Budget Feature
-document.getElementById("budget-form")?.addEventListener("submit", async (e) => {
+ddocument.getElementById("budget-form")?.addEventListener("submit", async (e) => {
   e.preventDefault();
+
   const budget = parseFloat(document.getElementById("budget-amount").value);
   const user_id = localStorage.getItem("user_id");
 
+  // 1. Update budget on backend
   const res = await fetch(`${API_BASE}/set_budget`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -398,9 +400,32 @@ document.getElementById("budget-form")?.addEventListener("submit", async (e) => 
 
   const data = await res.json();
   showMessage(data.message, "success");
-  fetchDashboardData();
-});
 
+  // 2. Fetch latest budget data
+  const statusRes = await fetch(`${API_BASE}/budget_status`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ user_id })
+  });
+
+  const statusData = await statusRes.json();
+
+  // 3. Update dashboard
+  document.getElementById("total-income").innerText = `₹${statusData.total_income.toFixed(2)}`;
+  document.getElementById("total-expenses").innerText = `₹${statusData.total_expenses.toFixed(2)}`;
+  document.getElementById("remaining-budget").innerText = `₹${statusData.remaining_budget.toFixed(2)}`;
+  document.getElementById("monthly-budget").innerText = `₹${statusData.monthly_budget?.toFixed(2) || 'Not Set'}`;
+
+  // 4. Handle over-budget warning
+  const overBudgetEl = document.getElementById("over-budget");
+  if (statusData.over_budget > 0) {
+    overBudgetEl.innerText = `⚠️ Over Budget by ₹${statusData.over_budget.toFixed(2)}`;
+    overBudgetEl.style.color = "red";
+    overBudgetEl.style.display = "block";
+  } else {
+    overBudgetEl.style.display = "none";
+  }
+});
 // PDF Download Feature
 document.getElementById("download-report")?.addEventListener("click", async () => {
   const user_id = localStorage.getItem("user_id");
