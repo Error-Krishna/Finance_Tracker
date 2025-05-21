@@ -390,6 +390,7 @@ document.getElementById("budget-form")?.addEventListener("submit", async (e) => 
   const budget = parseFloat(document.getElementById("budget-amount").value);
   const user_id = localStorage.getItem("user_id");
 
+  // Set budget API call
   const res = await fetch(`${API_BASE}/set_budget`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -398,9 +399,33 @@ document.getElementById("budget-form")?.addEventListener("submit", async (e) => 
 
   const data = await res.json();
   showMessage(data.message, "success");
-  fetchDashboardData();
-});
 
+  // Update dashboard data
+  fetchDashboardData();
+
+  // Fetch budget status
+  fetch('/budget_status', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ user_id }) // use same user_id
+  })
+  .then(response => response.json())
+  .then(data => {
+    document.getElementById('total-income').textContent = `₹${data.total_income}`;
+    document.getElementById('total-expenses').textContent = `₹${data.total_expenses}`;
+    document.getElementById('remaining-budget').textContent = `₹${data.balance}`;
+
+    if (data.over_budget && data.over_budget > 0) {
+      document.getElementById('over-budget').textContent = `₹${data.over_budget}`;
+      document.getElementById('over-budget-card').style.display = "block";
+    } else {
+      document.getElementById('over-budget-card').style.display = "none";
+    }
+  })
+  .catch(err => {
+    console.error("Error fetching budget status:", err);
+  });
+});
 // PDF Download Feature
 document.getElementById("download-report")?.addEventListener("click", async () => {
   const user_id = localStorage.getItem("user_id");
