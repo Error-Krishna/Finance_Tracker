@@ -413,7 +413,7 @@ document.getElementById("budget-form")?.addEventListener("submit", async (e) => 
   // 3. Update dashboard
   document.getElementById("total-income").innerText = `₹${statusData.total_income.toFixed(2)}`;
   document.getElementById("total-expenses").innerText = `₹${statusData.total_expenses.toFixed(2)}`;
-  document.getElementById("remaining-balance").innerText = `₹${statusData.remaining_budget.toFixed(2)}`;
+  document.getElementById("remaining-budget").innerText = `₹${statusData.remaining_budget.toFixed(2)}`;
   document.getElementById("monthly-budget").innerText = `₹${statusData.monthly_budget?.toFixed(2) || 'Not Set'}`;
 
   // 4. Handle over-budget warning
@@ -425,6 +425,7 @@ document.getElementById("budget-form")?.addEventListener("submit", async (e) => 
   } else {
     overBudgetEl.style.display = "none";
   }
+
 });
 // PDF Download Feature
 document.getElementById("download-report")?.addEventListener("click", async () => {

@@ -135,7 +135,7 @@ def budget_status():
     return jsonify({
         "total_income": total_income,
         "total_expenses": total_expenses,
-        "remaining_balance": remaining_balance,
+        "remaining_budget": remaining_balance,
         "monthly_budget": monthly_budget,
         "over_budget": over_budget
     })
