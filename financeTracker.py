@@ -115,31 +115,42 @@ def set_budget():
     )
     return jsonify({"message": "Budget updated successfully"})
 
+from flask import request, jsonify
+from pymongo.errors import PyMongoError
+
 @app.route("/budget_status", methods=["POST"])
 def budget_status():
-    user_id = request.json["user_id"]
+    try:
+        user_id = request.json.get("user_id")
+        if not user_id:
+            return jsonify({"error": "Missing user_id"}), 400
 
-    total_income = sum(i["amount"] for i in incomes_col.find({"user_id": user_id}))
-    total_expenses = sum(e["amount"] for e in expenses_col.find({"user_id": user_id}))
+        total_income = sum(float(i.get("amount", 0)) for i in incomes_col.find({"user_id": user_id}))
+        total_expenses = sum(float(e.get("amount", 0)) for e in expenses_col.find({"user_id": user_id}))
 
-    budget_doc = budgets_col.find_one({"user_id": user_id})
-    monthly_budget = budget_doc["budget"] if budget_doc and "budget" in budget_doc else None
+        budget_doc = budgets_col.find_one({"user_id": user_id})
+        monthly_budget = float(budget_doc.get("budget", 0)) if budget_doc and "budget" in budget_doc else None
 
-    if monthly_budget:
-        remaining_budget = monthly_budget - total_expenses
-        over_budget = max(0, total_expenses - monthly_budget)
-    else:
-        remaining_budget = total_income - total_expenses
-        over_budget = 0  # fallback when no budget is set
+        if monthly_budget is not None:
+            remaining_budget = monthly_budget - total_expenses
+            over_budget = max(0, total_expenses - monthly_budget)
+        else:
+            remaining_budget = total_income - total_expenses
+            over_budget = 0
 
         return jsonify({
-        "total_income": total_income,
-        "total_expenses": total_expenses,
-        "available_balance": total_income - total_expenses,  # Actual balance from income & expenses
-        "remaining_budget": remaining_budget,                # Budget-specific remaining amount
-        "monthly_budget": monthly_budget,
-        "over_budget": over_budget
-    })
+            "total_income": total_income,
+            "total_expenses": total_expenses,
+            "remaining_budget": remaining_budget,
+            "monthly_budget": monthly_budget,
+            "over_budget": over_budget,
+            "available_balance": total_income - total_expenses,
+        })
+
+    except PyMongoError as e:
+        return jsonify({"error": "Database error", "details": str(e)}), 500
+    except Exception as e:
+        return jsonify({"error": "Server error", "details": str(e)}), 500
 
 # ---------- SPENDING TRENDS ----------
 
