@@ -126,16 +126,16 @@ def budget_status():
     monthly_budget = budget_doc["budget"] if budget_doc and "budget" in budget_doc else None
 
     if monthly_budget:
-        remaining_balance = total_income - total_expenses
-        over_budget = total_expenses - monthly_budget
-    # else:
-    #     remaining_balance = total_income - total_expenses
-    #     over_budget = 0  # fallback when no budget is set
+        remaining_budget = monthly_budget - total_expenses
+        over_budget = max(0, total_expenses - monthly_budget)
+    else:
+        remaining_budget = total_income - total_expenses
+        over_budget = 0  # fallback when no budget is set
 
     return jsonify({
         "total_income": total_income,
         "total_expenses": total_expenses,
-        "remaining_budget": remaining_balance,
+        "remaining_budget": remaining_budget,
         "monthly_budget": monthly_budget,
         "over_budget": over_budget
     })
