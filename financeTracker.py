@@ -127,7 +127,7 @@ def budget_status():
 
     if monthly_budget:
         remaining_balance = total_income - total_expenses
-        over_budget = max(0, total_expenses - monthly_budget)
+        over_budget = total_expenses - monthly_budget
     else:
         remaining_balance = total_income - total_expenses
         over_budget = 0  # fallback when no budget is set
