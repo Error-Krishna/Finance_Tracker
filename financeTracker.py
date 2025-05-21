@@ -132,13 +132,13 @@ def budget_status():
         remaining_budget = total_income - total_expenses
         over_budget = 0  # fallback when no budget is set
 
-    return jsonify({
+        return jsonify({
         "total_income": total_income,
         "total_expenses": total_expenses,
-        "remaining_budget": remaining_budget,
-        "monthly_budget": monthly_budget,
-        "over_budget": over_budget,
         "available_balance": total_income - total_expenses,  # Actual balance from income & expenses
+        "remaining_budget": remaining_budget,                # Budget-specific remaining amount
+        "monthly_budget": monthly_budget,
+        "over_budget": over_budget
     })
 
 # ---------- SPENDING TRENDS ----------
