@@ -124,9 +124,10 @@ def budget_status():
 
     budget_doc = budgets_col.find_one({"user_id": user_id})
     monthly_budget = budget_doc["budget"] if budget_doc and "budget" in budget_doc else None
+    balance = total_income - total_expenses
 
     if monthly_budget:
-        remaining_budget = monthly_budget - total_expenses
+        remaining_budget = total_income - total_expenses
         over_budget = max(0, total_expenses - monthly_budget)
     else:
         remaining_budget = total_income - total_expenses
@@ -137,7 +138,8 @@ def budget_status():
         "total_expenses": total_expenses,
         "remaining_budget": remaining_budget,
         "monthly_budget": monthly_budget,
-        "over_budget": over_budget
+        "over_budget": over_budget,
+        "balance": balance
     })
 
 # ---------- SPENDING TRENDS ----------
