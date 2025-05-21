@@ -137,10 +137,3 @@ form button:hover {
     flex-direction: column;
   }
 }
-
-.over-budget {
-  background: #ff3b30; /* red background to indicate warning */
-  color: #fff; /* white text for contrast */
-  box-shadow: 0 4px 12px rgba(255, 59, 48, 0.5); /* red glow effect */
-  animation: pulse 1s infinite alternate;
-}

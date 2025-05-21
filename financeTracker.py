@@ -125,19 +125,13 @@ def budget_status():
     budget_doc = budgets_col.find_one({"user_id": user_id})
     monthly_budget = budget_doc["budget"] if budget_doc and "budget" in budget_doc else None
 
-    actual_balance = total_income - total_expenses
-
-    if monthly_budget is not None:
-        over_budget = total_expenses - monthly_budget if total_expenses > monthly_budget else 0
-    else:
-        over_budget = 0
+    remaining_budget = (monthly_budget - total_expenses) if monthly_budget else (total_income - total_expenses)
 
     return jsonify({
         "total_income": total_income,
         "total_expenses": total_expenses,
-        "balance": actual_balance,
-        "monthly_budget": monthly_budget,
-        "over_budget": over_budget
+        "remaining_budget": remaining_budget,
+        "monthly_budget": monthly_budget
     })
 
 # ---------- SPENDING TRENDS ----------
