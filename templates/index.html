@@ -88,7 +88,11 @@
         <div class="card">Total Income: <span id="total-income">₹0</span></div>
         <div class="card">Total Expenses: <span id="total-expenses">₹0</span></div>
         <div class="card">Balance: <span id="remaining-budget">₹0</span></div>
-        <div class="card" id="over-budget-card" style="color: red; display: none;">Over Budget: <span id="over-budget">₹0</span></div>
+
+        <!-- FIXED BELOW -->
+        <div class="card over-budget" id="over-budget-card" style="display: none;">
+          Over Budget: <span id="over-budget">₹0</span>
+        </div>
       </div>
       <div class="chart-container">
         <canvas id="spending-trends-chart"></canvas>
