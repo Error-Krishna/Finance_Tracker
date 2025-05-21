@@ -385,7 +385,7 @@ incomeForm.addEventListener("submit", async (e) => {
 });
 
 // Budget Feature
-ddocument.getElementById("budget-form")?.addEventListener("submit", async (e) => {
+document.getElementById("budget-form")?.addEventListener("submit", async (e) => {
   e.preventDefault();
 
   const budget = parseFloat(document.getElementById("budget-amount").value);
