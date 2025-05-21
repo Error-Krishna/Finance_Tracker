@@ -115,21 +115,17 @@ def set_budget():
     )
     return jsonify({"message": "Budget updated successfully"})
 
-from flask import request, jsonify
-from pymongo.errors import PyMongoError
-
 @app.route("/budget_status", methods=["POST"])
 def budget_status():
-    try:
-        user_id = request.json.get("user_id")
-        if not user_id:
-            return jsonify({"error": "Missing user_id"}), 400
+    user_id = request.json.get("user_id")
+    print("Received user_id:", user_id)
 
+    try:
         total_income = sum(float(i.get("amount", 0)) for i in incomes_col.find({"user_id": user_id}))
         total_expenses = sum(float(e.get("amount", 0)) for e in expenses_col.find({"user_id": user_id}))
 
         budget_doc = budgets_col.find_one({"user_id": user_id})
-        monthly_budget = float(budget_doc.get("budget", 0)) if budget_doc and "budget" in budget_doc else None
+        monthly_budget = float(budget_doc["budget"]) if budget_doc and "budget" in budget_doc else None
 
         if monthly_budget is not None:
             remaining_budget = monthly_budget - total_expenses
@@ -138,19 +134,24 @@ def budget_status():
             remaining_budget = total_income - total_expenses
             over_budget = 0
 
+        available_balance = total_income - total_expenses
+
+        print("Total Income:", total_income)
+        print("Total Expenses:", total_expenses)
+        print("Available Balance:", available_balance)
+
         return jsonify({
             "total_income": total_income,
             "total_expenses": total_expenses,
             "remaining_budget": remaining_budget,
             "monthly_budget": monthly_budget,
             "over_budget": over_budget,
-            "available_balance": total_income - total_expenses,
+            "available_balance": available_balance,
         })
 
-    except PyMongoError as e:
-        return jsonify({"error": "Database error", "details": str(e)}), 500
     except Exception as e:
-        return jsonify({"error": "Server error", "details": str(e)}), 500
+        print("Error in /budget_status:", str(e))
+        return jsonify({"error": "Internal Server Error"}), 500
 
 # ---------- SPENDING TRENDS ----------
 
