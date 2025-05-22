@@ -269,6 +269,7 @@ async function fetchDashboardData() {
     totalIncomeElem.textContent = `₹${data.total_income}`;
     totalExpensesElem.textContent = `₹${data.total_expenses}`;
     remainingBudgetElem.textContent = `₹${data.remaining_budget}`;
+    availableBalanceElem.textContent = `₹${data.available_balance}`;
 
     if (data.monthly_budget !== null && data.total_expenses > data.monthly_budget) {
       showMessage("⚠️ You are exceeding your budget!", "error");
@@ -415,7 +416,7 @@ document.getElementById("budget-form")?.addEventListener("submit", async (e) => 
   document.getElementById("total-expenses").innerText = `₹${statusData.total_expenses.toFixed(2)}`;
   document.getElementById("remaining-budget").innerText = `₹${statusData.remaining_budget.toFixed(2)}`;
   document.getElementById("monthly-budget").innerText = `₹${statusData.monthly_budget?.toFixed(2) || 'Not Set'}`;
-  document.getElementById("balance").innerText = `₹${statusData.available_balance.toFixed(2)}`;
+  document.getElementById("available-balance").innerText = `₹${statusData.available_balance.toFixed(2)}`;
 
   // 4. Handle over-budget warning
   const overBudgetEl = document.getElementById("over-budget");
