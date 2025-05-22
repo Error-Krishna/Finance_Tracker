@@ -136,10 +136,6 @@ def budget_status():
 
         available_balance = total_income - total_expenses
 
-        print("Total Income:", total_income)
-        print("Total Expenses:", total_expenses)
-        print("Available Balance:", available_balance)
-
         return jsonify({
             "total_income": total_income,
             "total_expenses": total_expenses,

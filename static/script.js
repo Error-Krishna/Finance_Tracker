@@ -417,7 +417,7 @@ document.getElementById("budget-form")?.addEventListener("submit", async (e) => 
   document.getElementById("total-expenses").innerText = `₹${statusData.total_expenses.toFixed(2)}`;
   document.getElementById("remaining-budget").innerText = `₹${statusData.remaining_budget.toFixed(2)}`;
   document.getElementById("monthly-budget").innerText = `₹${statusData.monthly_budget?.toFixed(2) || 'Not Set'}`;
-  document.getElementById("available-balance").innerText = `₹${statusData.available_balance.toFixed(2)}`;
+  document.getElementById("availableBalance").innerText = `₹${statusData.available_balance.toFixed(2)}`;
 
   // 4. Handle over-budget warning
   const overBudgetEl = document.getElementById("over-budget");
