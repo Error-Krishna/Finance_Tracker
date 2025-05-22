@@ -227,6 +227,244 @@
 // fetchSpendingTrends();
 
 
+const API_BASE = "https://finance-tracker-tymo.onrender.com";
+
+// Wait for DOM to load before executing
+document.addEventListener("DOMContentLoaded", () => {
+  // Elements - with null checks
+  const totalIncomeElem = document.getElementById("total-income");
+  const totalExpensesElem = document.getElementById("total-expenses");
+  const remainingBudgetElem = document.getElementById("remaining-budget");
+  const availableBalanceElem = document.getElementById("available-balance"); // Fixed ID (was available_balance)
+  const messageBox = document.getElementById("message-box");
+  const expenseForm = document.getElementById("expense-form");
+  const incomeForm = document.getElementById("income-form");
+  const spendingTrendsChartCanvas = document.getElementById("spending-trends-chart");
+  const spendingTrendsChartElem = spendingTrendsChartCanvas ? spendingTrendsChartCanvas.getContext("2d") : null;
+  const overBudgetEl = document.getElementById("over-budget");
+  const budgetForm = document.getElementById("budget-form");
+  const downloadReportBtn = document.getElementById("download-report");
+
+  let spendingTrendsChart;
+
+  // Safe element updater
+  const updateElement = (elem, value) => {
+    if (!elem) {
+      console.error("Element not found:", elem);
+      return false;
+    }
+    elem.textContent = value;
+    return true;
+  };
+
+  // Show message
+  function showMessage(message, type = "success") {
+    if (!messageBox) {
+      console.error("Message box element not found");
+      return;
+    }
+    
+    messageBox.textContent = message;
+    messageBox.style.display = "block";
+    messageBox.style.backgroundColor = type === "success" ? "#4CAF50" : "#f44336";
+    messageBox.style.color = "#fff";
+
+    setTimeout(() => {
+      messageBox.style.display = "none";
+    }, 3000);
+  }
+
+  // Format currency
+  const formatCurrency = (value) => `₹${(value || 0).toFixed(2)}`;
+
+  // Fetch and update dashboard
+  async function fetchDashboardData() {
+    try {
+      const user_id = localStorage.getItem("user_id");
+      if (!user_id) {
+        showMessage("User not logged in", "error");
+        return;
+      }
+
+      const response = await fetch(`${API_BASE}/budget_status`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ user_id })
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const data = await response.json();
+
+      // Update elements safely
+      updateElement(totalIncomeElem, formatCurrency(data.total_income));
+      updateElement(totalExpensesElem, formatCurrency(data.total_expenses));
+      updateElement(remainingBudgetElem, formatCurrency(data.remaining_budget));
+      updateElement(availableBalanceElem, formatCurrency(data.available_balance));
+
+      // Handle over-budget warning
+      if (overBudgetEl) {
+        if (data.over_budget > 0) {
+          overBudgetEl.textContent = `⚠️ Over Budget by ${formatCurrency(data.over_budget)}`;
+          overBudgetEl.style.display = "block";
+          overBudgetEl.style.color = "red";
+          showMessage("⚠️ You are exceeding your budget!", "error");
+        } else {
+          overBudgetEl.style.display = "none";
+        }
+      }
+    } catch (error) {
+      console.error("Dashboard error:", {
+        message: error.message,
+        stack: error.stack
+      });
+      showMessage("Error loading dashboard data", "error");
+    }
+  }
+
+  // Fetch Spending Trends
+  async function fetchSpendingTrends() {
+    if (!spendingTrendsChartElem) {
+      console.error("Chart canvas not found");
+      return;
+    }
+
+    try {
+      const user_id = localStorage.getItem("user_id");
+      const response = await fetch(`${API_BASE}/spending_trends`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ user_id })
+      });
+
+      const data = await response.json();
+
+      if (!data.trends || data.trends.length === 0) {
+        showMessage("No spending trends available", "info");
+        return;
+      }
+
+      const labels = data.trends.map(trend => trend._id);
+      const amounts = data.trends.map(trend => trend.total);
+
+      if (spendingTrendsChart) {
+        spendingTrendsChart.destroy();
+      }
+
+      spendingTrendsChart = new Chart(spendingTrendsChartElem, {
+        type: "doughnut",
+        data: {
+          labels,
+          datasets: [{
+            data: amounts,
+            backgroundColor: ["#f44336", "#ff9800", "#4caf50", "#2196f3"],
+          }]
+        }
+      });
+    } catch (error) {
+      console.error("Spending trends error:", error);
+      showMessage("Error loading spending trends", "error");
+    }
+  }
+
+  // Initialize forms only if they exist
+  if (expenseForm) {
+    expenseForm.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const user_id = localStorage.getItem("user_id");
+      const category = document.getElementById("expense-category").value;
+      const amount = parseFloat(document.getElementById("expense-amount").value);
+      const date = document.getElementById("expense-date").value;
+      const description = document.getElementById("expense-description").value;
+
+      if (amount <= 0 || isNaN(amount)) {
+        showMessage("Expense amount must be positive", "error");
+        return;
+      }
+
+      try {
+        const response = await fetch(`${API_BASE}/add_expense`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ user_id, category, amount, date, description })
+        });
+
+        if (response.ok) {
+          showMessage("Expense added successfully", "success");
+          fetchDashboardData();
+          fetchSpendingTrends();
+          expenseForm.reset();
+        } else {
+          const errorData = await response.json();
+          showMessage(errorData.message || "Error adding expense", "error");
+        }
+      } catch (error) {
+        showMessage("Error connecting to server", "error");
+      }
+    });
+  }
+
+  if (incomeForm) {
+    incomeForm.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const user_id = localStorage.getItem("user_id");
+      const source = document.getElementById("income-source").value;
+      const amount = parseFloat(document.getElementById("income-amount").value);
+      const date = document.getElementById("income-date").value;
+
+      if (amount <= 0 || isNaN(amount)) {
+        showMessage("Income amount must be positive", "error");
+        return;
+      }
+
+      try {
+        const response = await fetch(`${API_BASE}/add_income`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ user_id, source, amount, date })
+        });
+
+        if (response.ok) {
+          showMessage("Income added successfully", "success");
+          fetchDashboardData();
+          incomeForm.reset();
+        } else {
+          const errorData = await response.json();
+          showMessage(errorData.message || "Error adding income", "error");
+        }
+      } catch (error) {
+        showMessage("Error connecting to server", "error");
+      }
+    });
+  }
+
+  if (budgetForm) {
+    budgetForm.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const budget = parseFloat(document.getElementById("budget-amount").value);
+      const user_id = localStorage.getItem("user_id");
+
+      try {
+        const res = await fetch(`${API_BASE}/set_budget`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ user_id, budget })
+        });
+
+        const data = await res.json();
+        showMessage(data.message, data.success ? "success" : "error");
+
+        if (data.success) {
+          fetchDashboardData();
+        }
+      } catch (error) {
+        showMessage("Error setting budget", "error");
+      }
+    });
+  }
+
 if (downloadReportBtn) {
     downloadReportBtn.addEventListener("click", async () => {
       try {
@@ -332,3 +570,4 @@ if (downloadReportBtn) {
   // Initialize dashboard
   fetchDashboardData();
   fetchSpendingTrends();
+});
