@@ -294,9 +294,13 @@ async function fetchDashboardData() {
     }
 
   } catch (error) {
-    showMessage("Error loading dashboard data", "error");
-    console.error("Dashboard error:", error);
-  }
+  console.error("Dashboard error:", {
+    message: error.message,
+    stack: error.stack,
+    response: error.response // if using axios or similar
+  });
+  showMessage("Error loading dashboard data", "error");
+}
 }
 
 // Fetch Spending Trends
