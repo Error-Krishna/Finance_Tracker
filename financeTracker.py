@@ -123,30 +123,26 @@ def budget_status():
     if not user_id:
         return jsonify({"error": "User ID is required"}), 400
 
-    user = users_col.find_one({"_id": ObjectId(user_id)})
-
-    if not user:
-        return jsonify({"error": "User not found"}), 404
-
     # Fetch and sum income
-    incomes = incomes_col.find({"user_id": user_id})
+    incomes = list(incomes_col.find({"user_id": user_id}))
     total_income = sum(income.get("amount", 0) for income in incomes)
 
     # Fetch and sum expenses
-    expenses = expenses_col.find({"user_id": user_id})
+    expenses = list(expenses_col.find({"user_id": user_id}))
     total_expenses = sum(expense.get("amount", 0) for expense in expenses)
 
-    # Budget
-    monthly_budget = user.get("monthly_budget")
+    # Get budget from budgets collection
+    budget_data = budgets_col.find_one({"user_id": user_id})
+    monthly_budget = budget_data.get("budget") if budget_data else None
+
+    # Calculate budget-related values
     remaining_budget = 0
     over_budget = 0
 
     if monthly_budget is not None:
-        remaining_budget = monthly_budget - total_expenses
-        if total_expenses > monthly_budget:
-            over_budget = total_expenses - monthly_budget
+        remaining_budget = max(0, monthly_budget - total_expenses)
+        over_budget = max(0, total_expenses - monthly_budget)
 
-    # ✅ Fix: Calculate available_balance
     available_balance = total_income - total_expenses
 
     return jsonify({
@@ -155,7 +151,7 @@ def budget_status():
         "monthly_budget": monthly_budget,
         "remaining_budget": remaining_budget,
         "over_budget": over_budget,
-        "available_balance": available_balance  # ✅ Now returned correctly
+        "available_balance": available_balance
     })
 
 # ---------- SPENDING TRENDS ----------

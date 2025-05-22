@@ -266,7 +266,6 @@ function showMessage(message, type = "success") {
 async function fetchDashboardData() {
   try {
     const user_id = localStorage.getItem("user_id");
-
     const response = await fetch(`${API_BASE}/budget_status`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -275,19 +274,18 @@ async function fetchDashboardData() {
 
     const data = await response.json();
 
-    const income = data.total_income || 0;
-    const expenses = data.total_expenses || 0;
-    const budget = data.monthly_budget || 0;
-    const balance = income - expenses;
+    // Format values with 2 decimal places
+    const formatCurrency = (value) => `₹${value.toFixed(2)}`;
 
-    totalIncomeElem.textContent = `₹${income}`;
-    totalExpensesElem.textContent = `₹${expenses}`;
-    remainingBudgetElem.textContent = `₹${budget - expenses}`;
-    availableBalanceElem.textContent = `₹${balance}`;
+    totalIncomeElem.textContent = formatCurrency(data.total_income || 0);
+    totalExpensesElem.textContent = formatCurrency(data.total_expenses || 0);
+    remainingBudgetElem.textContent = formatCurrency(data.remaining_budget || 0);
+    availableBalanceElem.textContent = formatCurrency(data.available_balance || 0);
 
+    // Handle over-budget warning
     const overBudgetEl = document.getElementById("over-budget");
-    if (budget !== 0 && expenses > budget) {
-      overBudgetEl.innerText = `⚠️ Over Budget by ₹${(expenses - budget).toFixed(2)}`;
+    if (data.over_budget > 0) {
+      overBudgetEl.textContent = `⚠️ Over Budget by ${formatCurrency(data.over_budget)}`;
       overBudgetEl.style.display = "block";
       overBudgetEl.style.color = "red";
       showMessage("⚠️ You are exceeding your budget!", "error");
@@ -297,6 +295,7 @@ async function fetchDashboardData() {
 
   } catch (error) {
     showMessage("Error loading dashboard data", "error");
+    console.error("Dashboard error:", error);
   }
 }
 
