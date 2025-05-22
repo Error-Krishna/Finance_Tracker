@@ -235,6 +235,7 @@ const API_BASE = "https://finance-tracker-tymo.onrender.com";
 const totalIncomeElem = document.getElementById("total-income");
 const totalExpensesElem = document.getElementById("total-expenses");
 const remainingBudgetElem = document.getElementById("remaining-budget");
+const availableBalanceElem = document.getElementById("availableBalance");
 const expenseForm = document.getElementById("expense-form");
 const incomeForm = document.getElementById("income-form");
 const messageBox = document.getElementById("message-box");
