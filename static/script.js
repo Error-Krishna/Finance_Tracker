@@ -307,7 +307,7 @@ document.addEventListener("DOMContentLoaded", () => {
       // Handle over-budget warning
       if (overBudgetEl) {
         if (data.over_budget > 0) {
-          overBudgetEl.textContent = `⚠️ Over Budget by ${formatCurrency(data.over_budget)}`;
+          overBudgetEl.textContent = `Over Budget by ${formatCurrency(data.over_budget)}`;
           overBudgetEl.style.display = "block";
           overBudgetEl.style.color = "red";
           showMessage("⚠️ You are exceeding your budget!", "error");
